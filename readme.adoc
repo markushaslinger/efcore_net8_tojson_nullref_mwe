@@ -1,0 +1,57 @@
+:source-highlighter: highlightjs
+
+= `ToJson` Simple Test
+
+Setting a converter using `JsonSerializer` it works, but date column is treated as string during query.
+
+Running with the `ToJson` config without setting a (JSON) converter for the `LocalDate` gives the following error when inserting entity at `SaveChanges`:
+
+```csharp
+ An exception occurred in the database while saving changes for context type 'JsonColumnTest.TestContext'.
+      System.NullReferenceException: Object reference not set to an instance of an object.
+         at Microsoft.EntityFrameworkCore.Update.ModificationCommand.WriteJson(Utf8JsonWriter writer, Object navigationValue, IUpdateEntry parentEntry, IEntityType entityType, Nullable`1 ordinal, Boolean isCollection, Boolean isTopLevel)
+         at Microsoft.EntityFrameworkCore.Update.ModificationCommand.WriteJson(Utf8JsonWriter writer, Object navigationValue, IUpdateEntry parentEntry, IEntityType entityType, Nullable`1 ordinal, Boolean isCollection, Boolean isTopLevel)
+         at Microsoft.EntityFrameworkCore.Update.ModificationCommand.<GenerateColumnModifications>g__HandleJson|41_3(List`1 columnModifications, <>c__DisplayClass41_0&)
+         at Microsoft.EntityFrameworkCore.Update.ModificationCommand.GenerateColumnModifications()
+         at Microsoft.EntityFrameworkCore.Update.ModificationCommand.<>c.<get_ColumnModifications>b__33_0(ModificationCommand command)
+         at Microsoft.EntityFrameworkCore.Internal.NonCapturingLazyInitializer.EnsureInitialized[TParam,TValue](TValue& target, TParam param, Func`2 valueFactory)
+         at Microsoft.EntityFrameworkCore.Update.ModificationCommand.get_ColumnModifications()
+         at Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlUpdateSqlGenerator.AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, Int32 commandPosition, Boolean overridingSystemValue, Boolean& requiresTransaction)
+         at Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlUpdateSqlGenerator.AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, Int32 commandPosition, Boolean& requiresTransaction)
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.AddCommand(IReadOnlyModificationCommand modificationCommand)
+         at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.TryAddCommand(IReadOnlyModificationCommand modificationCommand)
+         at Microsoft.EntityFrameworkCore.Update.Internal.CommandBatchPreparer.CreateCommandBatches(IEnumerable`1 commandSet, Boolean moreCommandSets, Boolean assertColumnModification, ParameterNameGenerator parameterNameGenerator)+MoveNext()
+         at Microsoft.EntityFrameworkCore.Update.Internal.CommandBatchPreparer.BatchCommands(IList`1 entries, IUpdateAdapter updateAdapter)+MoveNext()
+         at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+         at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__112_0(DbContext _, ValueTuple`2 t)
+         at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+         at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+         at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+Unhandled exception. System.NullReferenceException: Object reference not set to an instance of an object.
+   at Microsoft.EntityFrameworkCore.Update.ModificationCommand.WriteJson(Utf8JsonWriter writer, Object navigationValue, IUpdateEntry parentEntry, IEntityType entityType, Nullable`1 ordinal, Boolean isCollection, Boolean isTopLevel)
+   at Microsoft.EntityFrameworkCore.Update.ModificationCommand.WriteJson(Utf8JsonWriter writer, Object navigationValue, IUpdateEntry parentEntry, IEntityType entityType, Nullable`1 ordinal, Boolean isCollection, Boolean isTopLevel)
+   at Microsoft.EntityFrameworkCore.Update.ModificationCommand.<GenerateColumnModifications>g__HandleJson|41_3(List`1 columnModifications, <>c__DisplayClass41_0&)
+   at Microsoft.EntityFrameworkCore.Update.ModificationCommand.GenerateColumnModifications()
+   at Microsoft.EntityFrameworkCore.Update.ModificationCommand.<>c.<get_ColumnModifications>b__33_0(ModificationCommand command)
+   at Microsoft.EntityFrameworkCore.Internal.NonCapturingLazyInitializer.EnsureInitialized[TParam,TValue](TValue& target, TParam param, Func`2 valueFactory)
+   at Microsoft.EntityFrameworkCore.Update.ModificationCommand.get_ColumnModifications()
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlUpdateSqlGenerator.AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, Int32 commandPosition, Boolean overridingSystemValue, Boolean& requiresTransaction)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Update.Internal.NpgsqlUpdateSqlGenerator.AppendInsertOperation(StringBuilder commandStringBuilder, IReadOnlyModificationCommand command, Int32 commandPosition, Boolean& requiresTransaction)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.AddCommand(IReadOnlyModificationCommand modificationCommand)
+   at Microsoft.EntityFrameworkCore.Update.ReaderModificationCommandBatch.TryAddCommand(IReadOnlyModificationCommand modificationCommand)
+   at Microsoft.EntityFrameworkCore.Update.Internal.CommandBatchPreparer.CreateCommandBatches(IEnumerable`1 commandSet, Boolean moreCommandSets, Boolean assertColumnModification, ParameterNameGenerator parameterNameGenerator)+MoveNext()
+   at Microsoft.EntityFrameworkCore.Update.Internal.CommandBatchPreparer.BatchCommands(IList`1 entries, IUpdateAdapter updateAdapter)+MoveNext()
+   at Microsoft.EntityFrameworkCore.Update.Internal.BatchExecutor.Execute(IEnumerable`1 commandBatches, IRelationalConnection connection)
+   at Microsoft.EntityFrameworkCore.Storage.RelationalDatabase.SaveChanges(IList`1 entries)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(IList`1 entriesToSave)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(StateManager stateManager, Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.<>c.<SaveChanges>b__112_0(DbContext _, ValueTuple`2 t)
+   at Npgsql.EntityFrameworkCore.PostgreSQL.Storage.Internal.NpgsqlExecutionStrategy.Execute[TState,TResult](TState state, Func`3 operation, Func`3 verifySucceeded)
+   at Microsoft.EntityFrameworkCore.ChangeTracking.Internal.StateManager.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges(Boolean acceptAllChangesOnSuccess)
+   at Microsoft.EntityFrameworkCore.DbContext.SaveChanges()
+   at Program.<Main>$(String[] args) in F:\temp\tojsontest\Program.cs:line 39
+```
